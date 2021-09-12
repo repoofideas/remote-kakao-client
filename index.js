@@ -32,14 +32,5 @@ const send = (msg) => {
   }
 };
 
-const repliers = [];
-
-/** @param {{ room: String, msg: String, sender: String, isGroupChat: boolean, replier: { reply: (msg: String, hideToast: Boolean) => Boolean, replyDelayed: (msg: String, delay: Number, hideToast: Boolean) => Boolean, markAsRead: () => Boolean }, imageDB: { getProfileBase64: () => String, getProfileImage: () => String, getProfileBitmap: () => any } } chatData} */
-const chatDataToString = (chatData) =>
-  JSON.stringify({ event: 'chat', data: { room: chatData.room, msg: chatData.msg, sender: chatData.sender, isGroupChat: chatData.isGroupChat, replier: repliers.push(chatData.replier), profileImage: chatData.imageDB.getProfileBase64() } });
-
-const response = (room, msg, sender, isGroupChat, replier, imageDB, packageName) => {
-  const params = { room: room, msg: msg, sender: sender, isGroupChat: isGroupChat, replier: replier, imageDB: imageDB, packageName: packageName };
-
-  send(chatDataToString(params));
-};
+const response = (room, msg, sender, isGroupChat, _, imageDB, packageName) =>
+  send(JSON.stringify({ event: 'chat', data: { room: room, msg: msg, sender: sender, isGroupChat: isGroupChat, profileImage: imageDB.getProfileBase64(), packageName: packageName } }));
