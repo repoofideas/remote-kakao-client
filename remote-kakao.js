@@ -1,11 +1,4 @@
-// 니가 직접 건들 수 있는 설정
-
-// 스크립트 이름
 const scriptName = 'remote-kakao';
-// 서버 주소
-const serverAddress = '172.30.1.1';
-// 서버 포트
-const serverPort = 3000;
 
 importPackage(java.net);
 
@@ -19,12 +12,12 @@ const generateId = (length) => {
 };
 
 const socket = new DatagramSocket();
-const address = InetAddress.getByName(serverAddress);
+const address = InetAddress.getByName('172.30.1.1');
 
 const send = (msg) => {
   try {
     const message = new java.lang.String(msg);
-    const packet = new DatagramPacket(message.getBytes(), message.getBytes().length, address, serverPort);
+    const packet = new DatagramPacket(message.getBytes(), message.getBytes().length, address, 3000);
 
     socket.send(packet);
   } catch (e) {
@@ -43,3 +36,5 @@ const response = (room, msg, sender, isGroupChat, replier, imageDB, packageName)
 
   send(chatDataToString(params));
 };
+
+for (let _ = 0; _ < 10; _++) send(generateId(10));
