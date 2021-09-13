@@ -21,16 +21,32 @@ const generateId = (length) => {
 const socket = new DatagramSocket();
 const address = InetAddress.getByName(serverAddress);
 
+const handleMessage = (msg, socket) => {
+  const { event, data } = JSON.parse(msg);
+
+  switch (event) {
+    case 'sendText':
+      const replyRoomRes = new java.lang.String(Api.replyRoom(data.room, data.text)).getBytes();
+      socket.send(new DatagramPacket(replyRoomRes, replyRoomRes.length, address, serverPort));
+      break;
+  }
+};
+
 const send = (msg) => {
   try {
-    const message = new java.lang.String(msg);
-    const packet = new DatagramPacket(message.getBytes(), message.getBytes().length, address, serverPort);
+    const message = new java.lang.String(msg).getBytes();
+    const packet = new DatagramPacket(message, message.length, address, serverPort);
 
     socket.send(packet);
+
+    while (true) {
+      socket.receive(packet);
+      Log.d(new java.lang.String(packet.getData(), 0, packet.getLength()));
+    }
   } catch (e) {
-    print(e);
+    Log.e(e);
   }
 };
 
 const response = (room, msg, sender, isGroupChat, _, imageDB, packageName) =>
-  send(JSON.stringify({ event: 'chat', data: { room: room, msg: msg, sender: sender, isGroupChat: isGroupChat, profileImage: imageDB.getProfileBase64(), packageName: packageName } }));
+  send(JSON.stringify({ event: 'chat', data: { room: room, text: msg, sender: sender, isGroupChat: isGroupChat, profileImage: imageDB.getProfileBase64(), packageName: packageName } }));
